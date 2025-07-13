@@ -1,6 +1,6 @@
 package com.songoda.epicanchors.guis;
 
-import com.songoda.core.gui.Gui;
+import com.songoda.core.gui.CustomizableGui;
 import com.songoda.core.gui.GuiUtils;
 import com.songoda.core.gui.methods.Closable;
 import com.songoda.core.third_party.net.kyori.adventure.text.Component;
@@ -11,13 +11,14 @@ import com.songoda.epicanchors.files.Settings;
 import com.songoda.epicanchors.utils.Callback;
 import com.songoda.third_party.com.cryptomorin.xseries.XMaterial;
 
-public class DestroyConfirmationGui extends Gui {
+public class DestroyConfirmationGui extends CustomizableGui {
     private final EpicAnchors plugin;
     private final Anchor anchor;
 
     private Callback<Boolean> handler;
 
     public DestroyConfirmationGui(EpicAnchors plugin, Anchor anchor, Callback<Boolean> callback) {
+        super(plugin, "destroy_confirmation"); // Enable CustomizableGui with key "destroy_confirmation"
         this.plugin = plugin;
         this.anchor = anchor;
 
@@ -52,12 +53,12 @@ public class DestroyConfirmationGui extends Gui {
                         (Settings.ALLOW_ANCHOR_BREAKING.getBoolean() ? "confirmDestroyLore" : "confirmDestroyLoreNoDrops"))
                 .getMessage();
 
-        setButton(11, GuiUtils.createButtonItem(XMaterial.RED_TERRACOTTA,
+        setButton("cancel_destroy", 11, GuiUtils.createButtonItem(XMaterial.RED_TERRACOTTA,
                         this.plugin.getLocale().getMessage("interface.button.cancelDestroy").getMessage(),
                         cancelLore.equals(Component.empty()) ? new Component[0] : new Component[]{cancelLore}),
                 event -> this.handler.accept(null, false));
 
-        setButton(15, GuiUtils.createButtonItem(XMaterial.GREEN_TERRACOTTA,
+        setButton("confirm_destroy", 15, GuiUtils.createButtonItem(XMaterial.GREEN_TERRACOTTA,
                         this.plugin.getLocale().getMessage("interface.button.confirmDestroy").getMessage(),
                         cancelLore.equals(Component.empty()) ? new Component[0] : new Component[]{confirmLore}),
                 event -> this.handler.accept(null, true));

@@ -2,11 +2,10 @@ package com.songoda.epicanchors.guis;
 
 import com.songoda.core.chat.AdventureUtils;
 import com.songoda.core.compatibility.CompatibleParticleHandler;
-import com.songoda.core.gui.Gui;
+import com.songoda.core.gui.CustomizableGui;
 import com.songoda.core.gui.GuiUtils;
 import com.songoda.core.hooks.EconomyManager;
 import com.songoda.core.third_party.net.kyori.adventure.text.Component;
-import com.songoda.core.utils.TextUtils;
 import com.songoda.core.utils.TimeUtils;
 import com.songoda.epicanchors.EpicAnchors;
 import com.songoda.epicanchors.api.Anchor;
@@ -19,11 +18,12 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class AnchorGui extends Gui {
+public class AnchorGui extends CustomizableGui {
     private final EpicAnchors plugin;
     private final Anchor anchor;
 
     public AnchorGui(EpicAnchors plugin, Anchor anchor) {
+        super(plugin, "anchor"); // Enable CustomizableGui with key "anchor"
         this.plugin = plugin;
         this.anchor = anchor;
 
@@ -43,7 +43,7 @@ public class AnchorGui extends Gui {
                     .processPlaceholder("cost", Settings.XP_COST.getInt())
                     .getMessage();
 
-            setButton(11,
+            setButton("add_time_xp", 11,
                     GuiUtils.createButtonItem(Settings.XP_ICON.getMaterial(XMaterial.EXPERIENCE_BOTTLE), itemName, itemLore),
                     event -> buyTime(this.anchor, event.player, false));
         }
@@ -55,7 +55,7 @@ public class AnchorGui extends Gui {
                     .processPlaceholder("cost", EconomyManager.formatEconomy(Settings.ECONOMY_COST.getDouble()))
                     .getMessage();
 
-            setButton(15,
+            setButton("add_time_economy", 15,
                     GuiUtils.createButtonItem(Settings.ECO_ICON.getMaterial(XMaterial.SUNFLOWER), itemName, itemLore),
                     event -> buyTime(this.anchor, event.player, true));
         }
@@ -95,30 +95,30 @@ public class AnchorGui extends Gui {
         }
     }
 
-    protected static void prepareGui(EpicAnchors plugin, Gui gui, Anchor anchor) {
+    protected static void prepareGui(EpicAnchors plugin, CustomizableGui gui, Anchor anchor) {
         ItemStack glass1 = GuiUtils.getBorderItem(Settings.GLASS_TYPE_1.getMaterial());
         ItemStack glass2 = GuiUtils.getBorderItem(Settings.GLASS_TYPE_2.getMaterial());
         ItemStack glass3 = GuiUtils.getBorderItem(Settings.GLASS_TYPE_3.getMaterial());
 
         gui.setDefaultItem(glass1);
 
-        gui.mirrorFill(0, 0, true, true, glass2);
-        gui.mirrorFill(0, 1, true, true, glass2);
-        gui.mirrorFill(0, 2, true, true, glass3);
-        gui.mirrorFill(1, 0, false, true, glass2);
-        gui.mirrorFill(1, 1, false, true, glass3);
+        gui.mirrorFill("border_0_0", 0, 0, true, true, glass2);
+        gui.mirrorFill("border_0_1", 0, 1, true, true, glass2);
+        gui.mirrorFill("border_0_2", 0, 2, true, true, glass3);
+        gui.mirrorFill("border_1_0", 1, 0, false, true, glass2);
+        gui.mirrorFill("border_1_1", 1, 1, false, true, glass3);
 
         Component itemName = plugin.getLocale().getMessage("interface.anchor.smalltitle").getMessage();
         Component itemLore = AdventureUtils.formatComponent(anchor.isInfinite() ?
                 "§7Infinite" :
                 "§7" + TimeUtils.makeReadable((long) ((anchor.getTicksLeft() / 20.0) * 1000)) + " remaining.");
 
-        gui.setItem(13, GuiUtils.createButtonItem(plugin.getAnchorManager().createAnchorItem(
+        gui.setItem("anchor_status", 13, GuiUtils.createButtonItem(plugin.getAnchorManager().createAnchorItem(
                         anchor.getTicksLeft(), anchor.getLocation().getBlock().getType()),
                 itemName, itemLore));
     }
 
-    protected static void runPreparedGuiTask(EpicAnchors plugin, Gui gui, Anchor anchor) {
+    protected static void runPreparedGuiTask(EpicAnchors plugin, CustomizableGui gui, Anchor anchor) {
         int taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             if (anchor.getTicksLeft() == 0) {
                 gui.close();
@@ -128,7 +128,7 @@ public class AnchorGui extends Gui {
                         ChatColor.GRAY + "Infinite" :
                         ChatColor.GRAY + TimeUtils.makeReadable((long) ((anchor.getTicksLeft() / 20.0) * 1000)) + " remaining.";
 
-                gui.updateItem(13, itemName, itemLore);
+                gui.updateItem("anchor_status", 13, itemName, itemLore);
             }
         }, 0, 20);
 
